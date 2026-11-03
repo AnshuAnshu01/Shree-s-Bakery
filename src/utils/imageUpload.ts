@@ -105,3 +105,4 @@ export async function copyImageToClipboard(file: File): Promise<boolean> {
   }
   return false;
 }
+
