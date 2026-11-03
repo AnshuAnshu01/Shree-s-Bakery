@@ -1,0 +1,6 @@
+{
+  "name": "Shree's Bakery - Luxury 3D Custom Cake Studio",
+  "description": "Premium 3D custom cake studio and ordering website for Shree's Bakery, featuring interactive 3D cake design, real-time lighting and shadows, custom booking with WhatsApp integration, live gallery, and owner dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
