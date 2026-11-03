@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleShare = async () => {
     const shareData = {
-      title: "Shree's Bakery - Luxury 3D Custom Cake Studio",
+      title: "Shree's Bakery",
       text: "Order fresh customized birthday, wedding & celebration cakes in 1/2 KG & 1 KG! Call/WhatsApp: 87086 61381",
       url: window.location.href,
     };
