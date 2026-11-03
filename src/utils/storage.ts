@@ -519,7 +519,13 @@ export function saveProducts(products: CakeProduct[]) {
   }
 }
 
-export function buildWhatsAppOrderMessage(order: Partial<CustomOrder>): string {
+export function getRawWhatsAppOrderMessage(order: Partial<CustomOrder>): string {
+  const photoLine = order.referenceImageUrl
+    ? (order.referenceImageUrl.startsWith('http')
+        ? `📸 *Reference Cake Photo Link:*\n${order.referenceImageUrl}`
+        : `📸 *Reference Photo:* Customer uploaded custom design photo (attached)`)
+    : '';
+
   const lines = [
     `🎂 *NEW CAKE ORDER - SHREE'S BAKERY* 🎂`,
     `----------------------------------------`,
@@ -533,12 +539,16 @@ export function buildWhatsAppOrderMessage(order: Partial<CustomOrder>): string {
     `📍 *Pick-Up / Delivery:* ${order.deliveryAddress || 'Store Pick-Up (Bakery Counter)'}`,
     `💰 *Budget:* ${order.budget || 'As per menu (1 KG: ₹500, 1/2 KG: ₹300)'}`,
     order.customInstructions ? `📝 *Message on Cake:* "${order.customInstructions}"` : '',
-    order.referenceImageUrl ? `📸 *Reference Photo:* (Uploaded via website)` : '',
+    photoLine,
     `----------------------------------------`,
     `✨ Baked with love at Shree's Bakery`
   ].filter(Boolean);
 
-  return encodeURIComponent(lines.join('\n'));
+  return lines.join('\n');
+}
+
+export function buildWhatsAppOrderMessage(order: Partial<CustomOrder>): string {
+  return encodeURIComponent(getRawWhatsAppOrderMessage(order));
 }
 
 export function getWhatsAppDirectUrl(order: Partial<CustomOrder>): string {

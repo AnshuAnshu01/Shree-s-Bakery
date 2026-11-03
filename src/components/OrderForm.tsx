@@ -11,15 +11,26 @@ import {
   Heart,
   ChevronDown,
   Clock,
-  Store
+  Store,
+  Share2,
+  Copy,
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 import { CustomOrder } from '../types/bakery';
 import { 
   BAKERY_DISPLAY_PHONE, 
   saveOrders, 
   getStoredOrders, 
-  getWhatsAppDirectUrl 
+  getWhatsAppDirectUrl,
+  getRawWhatsAppOrderMessage
 } from '../utils/storage';
+import {
+  uploadReferenceImage,
+  canShareFiles,
+  shareOrderWithFile,
+  copyImageToClipboard
+} from '../utils/imageUpload';
 import { LOGO_IMAGE_PATH } from './BakeryLogo';
 import { useTheme } from '../context/ThemeContext';
 
@@ -70,6 +81,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
   const [customInstructions, setCustomInstructions] = useState('');
   
   const [referenceImage, setReferenceImage] = useState<string | null>(null);
+  const [referenceFile, setReferenceFile] = useState<File | null>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [copiedPhoto, setCopiedPhoto] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -89,7 +104,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageError(null);
     const file = e.target.files?.[0];
     if (!file) return;
@@ -105,15 +120,33 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
       return;
     }
 
+    setReferenceFile(file);
+
     const reader = new FileReader();
     reader.onload = () => {
       setReferenceImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+
+    // Background upload immediately so it's ready for WhatsApp link!
+    setIsUploadingPhoto(true);
+    try {
+      const hosted = await uploadReferenceImage(file);
+      if (hosted) {
+        setUploadedUrl(hosted);
+      }
+    } catch (err) {
+      console.warn('Background image upload notice:', err);
+    } finally {
+      setIsUploadingPhoto(false);
+    }
   };
 
   const removeReferenceImage = () => {
     setReferenceImage(null);
+    setReferenceFile(null);
+    setUploadedUrl(null);
+    setIsUploadingPhoto(false);
     setImageError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -142,13 +175,25 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     setIsSubmitting(true);
 
     try {
+      let finalImageUrl = uploadedUrl;
+      if (!finalImageUrl && referenceFile) {
+        setIsUploadingPhoto(true);
+        try {
+          finalImageUrl = await uploadReferenceImage(referenceFile);
+          if (finalImageUrl) setUploadedUrl(finalImageUrl);
+        } catch {
+          // ignore
+        }
+        setIsUploadingPhoto(false);
+      }
+
       const orderNumber = `SB-${Math.floor(1000 + Math.random() * 9000)}`;
       const now = new Date();
       const createdAt = now.toLocaleDateString('en-IN', {
@@ -180,7 +225,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
         deliveryAddress: deliveryAddress.trim() || 'Store Pick-Up (Bakery Counter)',
         budget: budget || `₹${estimate}`,
         customInstructions: customInstructions.trim(),
-        referenceImageUrl: referenceImage || undefined,
+        referenceImageUrl: finalImageUrl || referenceImage || undefined,
         status: 'Pending',
         totalEstimate: estimate,
         threeDConfig: initialValues?.threeDConfig
@@ -203,7 +248,17 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
       setSubmittedOrder(newOrder);
       if (onOrderSubmitted) onOrderSubmitted(newOrder);
 
-      // Directly launch WhatsApp with the complete pre-filled order!
+      // Try native smartphone share with actual photo file if supported
+      if (referenceFile && canShareFiles(referenceFile)) {
+        const shared = await shareOrderWithFile(
+          `Cake Order #${newOrder.orderNumber} - Shree's Bakery`,
+          getRawWhatsAppOrderMessage(newOrder),
+          referenceFile
+        );
+        if (shared) return;
+      }
+
+      // Directly launch WhatsApp with pre-filled order
       const waUrl = getWhatsAppDirectUrl(newOrder);
       window.open(waUrl, '_blank', 'noopener,noreferrer');
     } catch (err) {
@@ -282,20 +337,115 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
             }`}>
               Your cake order <strong className={isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'}>#{submittedOrder.orderNumber}</strong> has opened in WhatsApp. If it didn't open automatically, tap below:
             </p>
-            <p className={`text-[11px] max-w-md mx-auto mb-6 ${isLight ? 'text-[#7c4d28]' : 'text-[#a89582]'}`}>
+            <p className={`text-[11px] max-w-md mx-auto mb-4 ${isLight ? 'text-[#7c4d28]' : 'text-[#a89582]'}`}>
               📅 Date: <strong>{submittedOrder.deliveryDate}</strong> • 📍 Fulfillment: <strong>{submittedOrder.deliveryAddress}</strong>
             </p>
 
-            <a
-              href={getWhatsAppDirectUrl(submittedOrder)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-[#25d366] to-[#1ebe5d] text-[#120703] font-bold text-sm uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-95 transition-all"
-            >
-              <MessageCircle className="w-4 h-4 fill-[#120703]" />
-              <span>Send Order on WhatsApp</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            {/* Reference Photo Confirmation Box */}
+            {(referenceImage || submittedOrder.referenceImageUrl) && (
+              <div className={`max-w-md mx-auto mb-5 p-3.5 rounded-2xl border text-left flex items-center gap-3.5 shadow-sm ${
+                isLight ? 'bg-[#f7efe4] border-[#d4af37]/60' : 'bg-[#180903] border-[#d4af37]/40'
+              }`}>
+                <div className="relative shrink-0 w-16 h-16 rounded-xl overflow-hidden border border-[#d4af37]/60 bg-black/30">
+                  <img
+                    src={referenceImage || submittedOrder.referenceImageUrl}
+                    alt="Reference Design"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-[#d4af37]" />
+                    <span className={`text-xs font-bold ${isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'}`}>
+                      Reference Cake Photo Included
+                    </span>
+                  </div>
+                  <p className={`text-[11px] leading-snug mt-0.5 ${isLight ? 'text-[#5a341e]' : 'text-[#cbb8a5]'}`}>
+                    {uploadedUrl ? (
+                      <>📸 Direct image preview link is included in your WhatsApp message!</>
+                    ) : (
+                      <>📸 Photo is attached. Tap camera/attachment 📎 in WhatsApp to share.</>
+                    )}
+                  </p>
+                  
+                  {/* Action buttons: Share Photo or Copy Photo */}
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {referenceFile && canShareFiles(referenceFile) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (submittedOrder && referenceFile) {
+                            shareOrderWithFile(
+                              `Cake Order #${submittedOrder.orderNumber} - Shree's Bakery`,
+                              getRawWhatsAppOrderMessage(submittedOrder),
+                              referenceFile
+                            );
+                          }
+                        }}
+                        className="text-[10px] px-2.5 py-1 rounded-lg font-bold bg-[#25d366] text-[#120703] hover:brightness-105 cursor-pointer flex items-center gap-1 shadow-sm"
+                      >
+                        <Share2 className="w-3 h-3" />
+                        <span>Send Photo to WhatsApp</span>
+                      </button>
+                    )}
+                    {referenceFile && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const ok = await copyImageToClipboard(referenceFile);
+                          if (ok) {
+                            setCopiedPhoto(true);
+                            setTimeout(() => setCopiedPhoto(false), 2500);
+                          }
+                        }}
+                        className={`text-[10px] px-2.5 py-1 rounded-lg font-semibold border cursor-pointer flex items-center gap-1 transition-colors ${
+                          copiedPhoto
+                            ? 'bg-emerald-700 text-white border-emerald-500'
+                            : isLight
+                            ? 'bg-white hover:bg-[#eedbc4] text-[#6b3d16] border-[#d4af37]/40'
+                            : 'bg-[#2a1409] hover:bg-[#3d1d0e] text-[#fce293] border-white/10'
+                        }`}
+                      >
+                        <Copy className="w-3 h-3" />
+                        <span>{copiedPhoto ? '✓ Copied to Clipboard!' : 'Copy Photo to Clipboard'}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-4">
+              {referenceFile && canShareFiles(referenceFile) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (submittedOrder && referenceFile) {
+                      shareOrderWithFile(
+                        `Cake Order #${submittedOrder.orderNumber} - Shree's Bakery`,
+                        getRawWhatsAppOrderMessage(submittedOrder),
+                        referenceFile
+                      );
+                    }
+                  }}
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#25d366] to-[#1ebe5d] text-[#120703] font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>Share Order + Photo to WhatsApp</span>
+                </button>
+              )}
+
+              <a
+                href={getWhatsAppDirectUrl(submittedOrder)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-[#25d366] to-[#1ebe5d] text-[#120703] font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 active:scale-95 transition-all"
+              >
+                <MessageCircle className="w-4 h-4 fill-[#120703]" />
+                <span>Open in WhatsApp</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
 
             <div className="mt-6">
               <button
@@ -521,20 +671,32 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
                   Reference Cake Photo (Optional - JPG, PNG, WEBP)
                 </label>
                 {referenceImage ? (
-                  <div className={`flex items-center gap-3 p-2 rounded-xl border ${
+                  <div className={`flex items-center gap-3 p-2.5 rounded-xl border ${
                     isLight ? 'bg-[#f7efe4] border-[#d4af37]/50' : 'bg-[#120703] border-[#d4af37]/40'
                   }`}>
-                    <img src={referenceImage} alt="Ref" className="w-14 h-14 object-cover rounded-lg" />
+                    <img src={referenceImage} alt="Ref" className="w-14 h-14 object-cover rounded-lg border border-[#d4af37]/40 shadow-sm" />
                     <div className="flex-1 min-w-0">
                       <span className={`text-xs block font-semibold truncate ${
                         isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
-                      }`}>Photo attached</span>
+                      }`}>
+                        Reference photo attached
+                      </span>
+                      {isUploadingPhoto ? (
+                        <div className="flex items-center gap-1 mt-0.5 text-[10px] text-amber-500">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          <span>Generating instant WhatsApp preview link...</span>
+                        </div>
+                      ) : uploadedUrl ? (
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                          ✓ Direct WhatsApp preview link ready
+                        </p>
+                      ) : null}
                       <button
                         type="button"
                         onClick={removeReferenceImage}
-                        className="text-[10px] text-red-500 hover:underline cursor-pointer"
+                        className="text-[10px] text-red-500 hover:underline cursor-pointer mt-0.5 block"
                       >
-                        Remove
+                        Remove Photo
                       </button>
                     </div>
                   </div>
@@ -555,7 +717,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
                       className="hidden"
                     />
                     <Upload className="w-5 h-5 text-[#d4af37] mx-auto mb-1" />
-                    <span className="text-xs block">Upload reference cake design photo</span>
+                    <span className="text-xs block font-medium">Upload reference cake design photo</span>
+                    <span className="text-[10px] opacity-75 block mt-0.5">Will be automatically shared to WhatsApp with your order</span>
                   </div>
                 )}
                 {imageError && <p className="text-[10px] text-red-500 mt-1">{imageError}</p>}
@@ -568,7 +731,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({ initialValues, onOrderSubm
               className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f7d668] to-[#b88616] text-[#190a04] font-cinzel font-extrabold text-xs uppercase tracking-widest shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <MessageCircle className="w-4 h-4 fill-[#190a04]" />
-              <span>{isSubmitting ? 'Submitting...' : 'Submit Order & Open WhatsApp'}</span>
+              <span>{isSubmitting ? 'Submitting & Preparing Photo...' : 'Submit Order & Open WhatsApp'}</span>
             </button>
           </form>
         )}
