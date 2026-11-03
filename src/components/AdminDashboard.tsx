@@ -29,6 +29,7 @@ import {
 } from '../utils/storage';
 import { REAL_CAKE_COLLECTION } from '../data/realCakes';
 import { LOGO_IMAGE_PATH } from './BakeryLogo';
+import { useTheme } from '../context/ThemeContext';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -76,6 +77,7 @@ const PAGE_DEFINITIONS: PageDefinition[] = [
 ];
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose }) => {
+  const { isLight } = useTheme();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -348,21 +350,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-6xl h-[94vh] max-h-[94vh] bg-[#1a0c06] border-2 border-[#d4af37]/80 rounded-3xl overflow-hidden shadow-2xl flex flex-col text-[#fbf6ee]">
+      <div className={`admin-portal relative w-full max-w-6xl h-[94vh] max-h-[94vh] border-2 rounded-3xl overflow-hidden shadow-2xl flex flex-col transition-colors ${
+        isLight
+          ? 'bg-[#fffdfa] border-[#d4af37] text-[#241107]'
+          : 'bg-[#1a0c06] border-[#d4af37]/80 text-[#fbf6ee]'
+      }`}>
         
         {/* Header Bar */}
-        <div className="bg-gradient-to-r from-[#2c1308] via-[#3a1a0c] to-[#2c1308] border-b border-[#d4af37]/40 px-5 py-3.5 flex items-center justify-between shrink-0">
+        <div className={`border-b px-5 py-3.5 flex items-center justify-between shrink-0 transition-colors ${
+          isLight
+            ? 'bg-gradient-to-r from-[#faf5ee] via-[#f5ede1] to-[#faf5ee] border-[#d4af37]/40 text-[#241107]'
+            : 'bg-gradient-to-r from-[#2c1308] via-[#3a1a0c] to-[#2c1308] border-[#d4af37]/40 text-[#fbf6ee]'
+        }`}>
           <div className="flex items-center gap-3">
             <img
               src={LOGO_IMAGE_PATH}
               alt="Shree's Bakery"
-              className="w-10 h-10 object-contain rounded-full border border-[#d4af37]/60 shadow bg-[#120703]"
+              className={`w-10 h-10 object-contain rounded-full border border-[#d4af37]/60 shadow ${
+                isLight ? 'bg-white' : 'bg-[#120703]'
+              }`}
             />
             <div>
-              <h3 className="font-serif-luxury font-bold text-base sm:text-lg text-[#fbf6ee] leading-tight flex items-center gap-2">
+              <h3 className={`font-serif-luxury font-bold text-base sm:text-lg leading-tight flex items-center gap-2 ${
+                isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+              }`}>
                 <span>Shree’s Bakery — Admin Portal</span>
               </h3>
-              <p className="text-[11px] text-[#fce293]">
+              <p className={`text-[11px] font-medium ${
+                isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+              }`}>
                 Manage Cake Images, Descriptions & Pricing Organised by Page Name
               </p>
             </div>
@@ -372,7 +388,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             {isAuthenticated && (
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 rounded-lg bg-[#241108] hover:bg-[#34180c] text-[#fce293] border border-[#d4af37]/40 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                className={`px-3 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  isLight
+                    ? 'bg-white hover:bg-[#eedbc4] text-[#6b3d16] border-[#d4af37]/50 shadow-sm'
+                    : 'bg-[#241108] hover:bg-[#34180c] text-[#fce293] border-[#d4af37]/40'
+                }`}
                 title="Log out of admin"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -381,7 +401,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             )}
             <button
               onClick={onClose}
-              className="p-2 rounded-full bg-[#180a04] text-[#fce293] hover:text-white border border-[#d4af37]/40 cursor-pointer"
+              className={`p-2 rounded-full border cursor-pointer transition-colors ${
+                isLight
+                  ? 'bg-white hover:bg-[#eedbc4] text-[#6b3d16] border-[#d4af37]/50 shadow-sm'
+                  : 'bg-[#180a04] text-[#fce293] hover:text-white border-[#d4af37]/40'
+              }`}
               aria-label="Close Admin Modal"
             >
               <X className="w-5 h-5" />
@@ -392,14 +416,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         {/* Minimal Login Screen */}
         {!isAuthenticated ? (
           <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-10 max-w-md mx-auto w-full text-center">
-            <div className="w-16 h-16 rounded-full bg-[#d4af37]/15 border border-[#d4af37] flex items-center justify-center text-[#fce293] mb-4 shadow-lg">
+            <div className={`w-16 h-16 rounded-full border flex items-center justify-center mb-4 shadow-lg ${
+              isLight
+                ? 'bg-[#eedbc4] border-[#d4af37] text-[#8a4e0c]'
+                : 'bg-[#d4af37]/15 border-[#d4af37] text-[#fce293]'
+            }`}>
               <Lock className="w-8 h-8 text-[#d4af37]" />
             </div>
 
-            <h4 className="text-2xl font-serif-luxury font-bold text-[#fbf6ee] mb-1">
+            <h4 className={`text-2xl font-serif-luxury font-bold mb-1 ${
+              isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+            }`}>
               Admin Access
             </h4>
-            <p className="text-xs text-[#cbb8a5] mb-6">
+            <p className={`text-xs mb-6 ${
+              isLight ? 'text-[#6b4226]' : 'text-[#cbb8a5]'
+            }`}>
               Enter password to edit cake photos, descriptions, and page prices.
             </p>
 
@@ -414,12 +446,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     if (authError) setAuthError(false);
                   }}
                   autoFocus
-                  className="w-full bg-[#120703] border-2 border-[#d4af37]/50 rounded-xl px-4 py-3 pr-11 text-base font-medium text-white placeholder-stone-500 focus:outline-none focus:border-[#d4af37] transition-colors"
+                  className={`w-full border-2 rounded-xl px-4 py-3 pr-11 text-base font-medium focus:outline-none transition-colors ${
+                    isLight
+                      ? 'bg-white border-[#d4af37] text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                      : 'bg-[#120703] border-[#d4af37]/50 text-white placeholder-stone-500 focus:border-[#d4af37]'
+                  }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-[#fce293] p-1 cursor-pointer"
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 cursor-pointer transition-colors ${
+                    isLight ? 'text-[#8b6b55] hover:text-[#241107]' : 'text-stone-400 hover:text-[#fce293]'
+                  }`}
                   aria-label="Toggle password visibility"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -427,7 +465,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               </div>
 
               {authError && (
-                <div className="p-2.5 rounded-lg bg-red-950/80 border border-red-500/50 text-red-300 text-xs text-left">
+                <div className={`p-2.5 rounded-lg border text-xs text-left ${
+                  isLight
+                    ? 'bg-red-50 border-red-300 text-red-700'
+                    : 'bg-red-950/80 border border-red-500/50 text-red-300'
+                }`}>
                   ❌ Incorrect password. Please try again.
                 </div>
               )}
@@ -453,7 +495,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
             )}
 
             {/* Top Toolbar: Page Name Tabs & Actions */}
-            <div className="p-3 sm:p-4 bg-[#140803] border-b border-white/10 flex flex-col md:flex-row items-center justify-between gap-3 shrink-0">
+            <div className={`p-3 sm:p-4 border-b flex flex-col md:flex-row items-center justify-between gap-3 shrink-0 transition-colors ${
+              isLight ? 'bg-[#f6eee3] border-[#d4af37]/30' : 'bg-[#140803] border-white/10'
+            }`}>
               {/* Page Name Filter Tabs */}
               <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
                 <button
@@ -461,6 +505,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                     activeSection === 'all'
                       ? 'bg-[#d4af37] text-[#140703] font-bold shadow-md'
+                      : isLight
+                      ? 'bg-white text-[#542d17] hover:bg-[#eedbc4] border border-[#d4af37]/40 shadow-sm'
                       : 'bg-[#241108] text-[#d4c3b3] hover:text-white border border-white/5'
                   }`}
                 >
@@ -478,12 +524,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                       className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                         isActive
                           ? 'bg-[#d4af37] text-[#140703] font-bold shadow-md'
+                          : isLight
+                          ? 'bg-white text-[#542d17] hover:bg-[#eedbc4] border border-[#d4af37]/40 shadow-sm'
                           : 'bg-[#241108] text-[#d4c3b3] hover:text-white border border-white/5'
                       }`}
                     >
                       <span>{page.icon}</span>
                       <span>{page.pageName}</span>
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-[#140703]/20 font-extrabold' : 'bg-black/30 text-stone-400'}`}>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                        isActive
+                          ? 'bg-[#140703]/20 text-[#140703]'
+                          : isLight
+                          ? 'bg-[#eedbc4] text-[#6b3d16]'
+                          : 'bg-black/30 text-stone-400'
+                      }`}>
                         {count}
                       </span>
                     </button>
@@ -494,13 +548,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               {/* Action Buttons: Add Cake & Search */}
               <div className="flex items-center gap-2 w-full md:w-auto justify-end">
                 <div className="relative flex-1 md:w-48">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                  <Search className={`w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 ${
+                    isLight ? 'text-[#8b6b55]' : 'text-stone-400'
+                  }`} />
                   <input
                     type="text"
                     placeholder="Search cake or price..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-[#241108] border border-white/10 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-lg pl-8 pr-3 py-1.5 text-xs focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37]/50 text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                        : 'bg-[#241108] border-white/10 text-white focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
@@ -520,7 +580,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 <button
                   onClick={handleResetDefaults}
-                  className="p-1.5 rounded-lg bg-[#241108] hover:bg-[#34180c] text-stone-400 hover:text-stone-200 border border-white/10 text-xs cursor-pointer"
+                  className={`p-1.5 rounded-lg border text-xs cursor-pointer transition-colors ${
+                    isLight
+                      ? 'bg-white text-[#542d17] border-[#d4af37]/40 hover:bg-[#eedbc4]'
+                      : 'bg-[#241108] hover:bg-[#34180c] text-stone-400 hover:text-stone-200 border border-white/10'
+                  }`}
                   title="Reset all sections to default data"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -545,17 +609,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     return (
                       <div key={page.id} className="space-y-3.5">
                         {/* Page Section Banner */}
-                        <div className="flex items-center justify-between pb-2 border-b border-[#d4af37]/30">
+                        <div className={`flex items-center justify-between pb-2 border-b ${
+                          isLight ? 'border-[#d4af37]/40' : 'border-[#d4af37]/30'
+                        }`}>
                           <div className="flex items-center gap-2.5">
                             <span className="text-xl">{page.icon}</span>
                             <div>
-                              <h4 className="font-serif-luxury font-bold text-base text-[#fce293] flex items-center gap-2">
+                              <h4 className={`font-serif-luxury font-bold text-base flex items-center gap-2 ${
+                                isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                              }`}>
                                 <span>{page.badgeLabel}</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-[#d4af37]/20 border border-[#d4af37]/40 text-[#fce293] font-sans font-semibold">
+                                <span className={`text-xs px-2 py-0.5 rounded-full border font-sans font-semibold ${
+                                  isLight
+                                    ? 'bg-[#eedbc4] border-[#d4af37]/50 text-[#6b3d16]'
+                                    : 'bg-[#d4af37]/20 border-[#d4af37]/40 text-[#fce293]'
+                                }`}>
                                   {pageCakes.length} Image Frames
                                 </span>
                               </h4>
-                              <p className="text-[11px] text-[#cbb8a5]">
+                              <p className={`text-[11px] ${
+                                isLight ? 'text-[#6b4226]' : 'text-[#cbb8a5]'
+                              }`}>
                                 {page.description}
                               </p>
                             </div>
@@ -566,7 +640,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               setAddForm(prev => ({ ...prev, section: page.id }));
                               setIsAddingNew(true);
                             }}
-                            className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#241108] hover:bg-[#34180c] border border-[#d4af37]/30 text-xs font-semibold text-[#fce293] cursor-pointer"
+                            className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                              isLight
+                                ? 'bg-white hover:bg-[#eedbc4] border-[#d4af37]/40 text-[#8a4e0c]'
+                                : 'bg-[#241108] hover:bg-[#34180c] border border-[#d4af37]/30 text-[#fce293]'
+                            }`}
                           >
                             <Plus className="w-3.5 h-3.5 text-[#d4af37]" />
                             <span>Add to {page.pageName}</span>
@@ -578,10 +656,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                           {pageCakes.map((cake) => (
                             <div
                               key={cake.id}
-                              className="bg-[#241108]/90 border border-[#d4af37]/30 hover:border-[#d4af37] rounded-2xl overflow-hidden shadow-lg transition-all flex flex-col group"
+                              className={`rounded-2xl overflow-hidden shadow-lg transition-all flex flex-col group border ${
+                                isLight
+                                  ? 'bg-white border-[#e7d5be] hover:border-[#d4af37] shadow-[0_4px_15px_rgba(180,140,80,0.1)]'
+                                  : 'bg-[#241108]/90 border-[#d4af37]/30 hover:border-[#d4af37]'
+                              }`}
                             >
                               {/* Image Frame with Quick Change Overlay */}
-                              <div className="relative h-48 w-full bg-[#120703] p-2 flex items-center justify-center overflow-hidden border-b border-white/5">
+                              <div className={`relative h-48 w-full p-2 flex items-center justify-center overflow-hidden border-b ${
+                                isLight ? 'bg-[#fbf7f0] border-[#e7d5be]' : 'bg-[#120703] border-white/5'
+                              }`}>
                                 <img
                                   src={cake.image}
                                   alt={cake.title}
@@ -592,7 +676,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                                 />
 
                                 {/* Page Badge */}
-                                <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-[#120703]/90 border border-[#d4af37]/40 text-[10px] font-semibold text-[#fce293] backdrop-blur-sm">
+                                <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-md border text-[10px] font-semibold backdrop-blur-sm ${
+                                  isLight
+                                    ? 'bg-white/95 border-[#d4af37]/50 text-[#8a4e0c]'
+                                    : 'bg-[#120703]/90 border-[#d4af37]/40 text-[#fce293]'
+                                }`}>
                                   {page.pageName}
                                 </div>
 
@@ -640,24 +728,38 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                               <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
                                 <div>
                                   <div className="flex items-start justify-between gap-2 mb-1.5">
-                                    <h5 className="font-serif-luxury font-bold text-sm text-[#fbf6ee] line-clamp-1">
+                                    <h5 className={`font-serif-luxury font-bold text-sm line-clamp-1 ${
+                                      isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+                                    }`}>
                                       {cake.title}
                                     </h5>
-                                    <span className="text-xs font-bold text-[#d4af37] bg-[#140803] px-2 py-0.5 rounded-md border border-[#d4af37]/35 whitespace-nowrap shadow-sm">
+                                    <span className={`text-xs font-bold px-2 py-0.5 rounded-md border whitespace-nowrap shadow-sm ${
+                                      isLight
+                                        ? 'text-[#8a4e0c] bg-[#eedbc4] border-[#d4af37]/50'
+                                        : 'text-[#d4af37] bg-[#140803] border-[#d4af37]/35'
+                                    }`}>
                                       {cake.price}
                                     </span>
                                   </div>
 
-                                  <p className="text-[11px] text-[#cbb8a5] line-clamp-2 leading-relaxed">
+                                  <p className={`text-[11px] line-clamp-2 leading-relaxed ${
+                                    isLight ? 'text-[#5a341e]' : 'text-[#cbb8a5]'
+                                  }`}>
                                     {cake.description}
                                   </p>
                                 </div>
 
                                 {/* Edit CTA Button */}
-                                <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                                <div className={`flex items-center gap-2 pt-2 border-t ${
+                                  isLight ? 'border-[#e7d5be]' : 'border-white/5'
+                                }`}>
                                   <button
                                     onClick={() => startEditing(cake)}
-                                    className="flex-1 py-1.5 rounded-lg bg-[#34180c] hover:bg-[#482010] text-[#fce293] border border-[#d4af37]/40 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                    className={`flex-1 py-1.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                                      isLight
+                                        ? 'bg-[#eedbc4] hover:bg-[#d4af37] text-[#4d2811] hover:text-[#140703] border-[#d4af37]/50'
+                                        : 'bg-[#34180c] hover:bg-[#482010] text-[#fce293] border-[#d4af37]/40'
+                                    }`}
                                   >
                                     <Edit3 className="w-3.5 h-3.5" />
                                     <span>Edit Details & Price</span>
@@ -665,7 +767,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                                   <button
                                     onClick={() => handleDelete(cake)}
-                                    className="p-1.5 rounded-lg bg-[#200c06] hover:bg-red-950 text-stone-400 hover:text-red-400 border border-white/5 transition-colors cursor-pointer"
+                                    className={`p-1.5 rounded-lg border transition-colors cursor-pointer ${
+                                      isLight
+                                        ? 'bg-[#fbf7f0] hover:bg-red-100 text-stone-500 hover:text-red-700 border-[#e7d5be]'
+                                        : 'bg-[#200c06] hover:bg-red-950 text-stone-400 hover:text-red-400 border border-white/5'
+                                    }`}
                                     title="Delete cake frame"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -681,10 +787,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               )}
             </div>
 
-            {/* Footer Summary Strip (Password Removed) */}
-            <div className="px-5 py-2.5 bg-[#140803] border-t border-white/10 text-xs text-[#b8a490] flex items-center justify-between shrink-0">
-              <span>Showing <strong>{filteredCakes.length}</strong> cake frames across all pages</span>
-              <span className="text-[11px] text-[#fce293]">Shree’s Bakery • Live Changes Active</span>
+            {/* Footer Summary Strip */}
+            <div className={`px-5 py-2.5 border-t text-xs flex items-center justify-between shrink-0 transition-colors ${
+              isLight ? 'bg-[#f6eee3] border-[#d4af37]/30 text-[#5a341e]' : 'bg-[#140803] border-white/10 text-[#b8a490]'
+            }`}>
+              <span>Showing <strong className={isLight ? 'text-[#241107]' : 'text-white'}>{filteredCakes.length}</strong> cake frames across all pages</span>
+              <span className={`text-[11px] font-semibold ${
+                isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+              }`}>Shree’s Bakery • Live Changes Active</span>
             </div>
           </div>
         )}
@@ -692,18 +802,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         {/* Modal: Edit Cake Frame (Photo, Page, Details, Price) */}
         {editingCake && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-[#1e0e07] border-2 border-[#d4af37] rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+            <div className={`relative w-full max-w-lg border-2 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto transition-colors ${
+              isLight
+                ? 'bg-[#fffdfa] border-[#d4af37] text-[#241107]'
+                : 'bg-[#1e0e07] border-[#d4af37] text-[#fbf6ee]'
+            }`}>
               
-              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <div className={`flex items-center justify-between pb-3 border-b mb-4 ${
+                isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+              }`}>
                 <div className="flex items-center gap-2">
                   <Edit3 className="w-4 h-4 text-[#d4af37]" />
-                  <h4 className="font-serif-luxury font-bold text-base text-[#fbf6ee]">
+                  <h4 className={`font-serif-luxury font-bold text-base ${
+                    isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+                  }`}>
                     Edit Cake Frame: {editingCake.title}
                   </h4>
                 </div>
                 <button
                   onClick={() => setEditingCake(null)}
-                  className="p-1 text-stone-400 hover:text-white cursor-pointer"
+                  className={`p-1 cursor-pointer transition-colors ${
+                    isLight ? 'text-[#8b6b55] hover:text-[#241107]' : 'text-stone-400 hover:text-white'
+                  }`}
+                  aria-label="Close edit modal"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -712,16 +833,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               <form onSubmit={handleSaveEdit} className="space-y-4">
                 {/* Select / Change Page */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Display on Page:
                   </label>
                   <select
                     value={editForm.section}
                     onChange={(e) => setEditForm({ ...editForm, section: e.target.value as CakeSectionId })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   >
                     {PAGE_DEFINITIONS.map(p => (
-                      <option key={p.id} value={p.id}>
+                      <option key={p.id} value={p.id} className={isLight ? 'bg-white text-[#241107]' : 'bg-[#1e0e07] text-[#fbf6ee]'}>
                         {p.icon} {p.badgeLabel}
                       </option>
                     ))}
@@ -730,11 +857,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Cake Photo Selection */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1.5">
+                  <label className={`block text-xs font-semibold mb-1.5 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Cake Frame Photo
                   </label>
                   <div className="flex items-start gap-3">
-                    <div className="w-24 h-24 rounded-xl bg-[#120703] border border-[#d4af37]/40 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow">
+                    <div className={`w-24 h-24 rounded-xl border p-1 flex items-center justify-center overflow-hidden shrink-0 shadow ${
+                      isLight ? 'bg-[#fbf7f0] border-[#d4af37]/40' : 'bg-[#120703] border-[#d4af37]/40'
+                    }`}>
                       <img
                         src={editForm.image || LOGO_IMAGE_PATH}
                         alt="Preview"
@@ -746,7 +877,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2">
-                        <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#2a1409] hover:bg-[#3d1d0e] border border-[#d4af37]/40 text-xs font-semibold text-[#fce293] cursor-pointer">
+                        <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                          isLight
+                            ? 'bg-[#eedbc4] hover:bg-[#d4af37] border-[#d4af37]/60 text-[#4d2811]'
+                            : 'bg-[#2a1409] hover:bg-[#3d1d0e] border border-[#d4af37]/40 text-[#fce293]'
+                        }`}>
                           <Upload className="w-3.5 h-3.5 text-[#d4af37]" />
                           <span>Upload from Device</span>
                           <input
@@ -763,7 +898,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             setPhotoPickerTarget('edit');
                             setIsPhotoPickerOpen(true);
                           }}
-                          className="px-3 py-2 rounded-lg bg-[#241108] hover:bg-[#34180c] border border-white/10 text-xs font-semibold text-stone-200 cursor-pointer flex items-center gap-1"
+                          className={`px-3 py-2 rounded-lg border text-xs font-semibold cursor-pointer flex items-center gap-1 transition-colors ${
+                            isLight
+                              ? 'bg-white hover:bg-[#eedbc4] border-[#d4af37]/50 text-[#542d17]'
+                              : 'bg-[#241108] hover:bg-[#34180c] border border-white/10 text-stone-200'
+                          }`}
                         >
                           <ImageIcon className="w-3.5 h-3.5 text-[#d4af37]" />
                           <span>Choose Gallery</span>
@@ -775,7 +914,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         placeholder="Or enter Image URL / Path"
                         value={editForm.image}
                         onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                        className="w-full bg-[#120703] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-stone-300 focus:outline-none focus:border-[#d4af37]"
+                        className={`w-full rounded-lg px-2.5 py-1.5 text-xs focus:outline-none transition-colors border ${
+                          isLight
+                            ? 'bg-white border-[#d4af37]/40 text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                            : 'bg-[#120703] border border-white/10 text-stone-300 placeholder-stone-500 focus:border-[#d4af37]'
+                        }`}
                       />
                     </div>
                   </div>
@@ -783,7 +926,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Cake Title */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Cake Name / Title
                   </label>
                   <input
@@ -791,13 +936,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     required
                     value={editForm.title}
                     onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-sm focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Price Details */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Price Details
                   </label>
                   <input
@@ -806,18 +957,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="e.g. ₹500, ₹300, 1 KG – ₹500 | 1/2 KG – ₹300"
                     value={editForm.price}
                     onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-sm font-bold text-[#fce293] focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-sm font-bold focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#8a4e0c] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-[#fce293] focus:border-[#d4af37]'
+                    }`}
                   />
                   
                   {/* Quick price chips */}
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                    <span className="text-[10px] text-stone-400">Quick presets:</span>
+                    <span className={`text-[10px] font-medium ${isLight ? 'text-[#6b4226]' : 'text-stone-400'}`}>Quick presets:</span>
                     {pricePresets.map(preset => (
                       <button
                         key={preset}
                         type="button"
                         onClick={() => setEditForm({ ...editForm, price: preset })}
-                        className="px-2 py-0.5 rounded-md bg-[#241108] hover:bg-[#34180c] text-[10px] text-[#fce293] border border-white/5 cursor-pointer"
+                        className={`px-2 py-0.5 rounded-md text-[10px] cursor-pointer transition-colors border ${
+                          isLight
+                            ? 'bg-[#eedbc4] hover:bg-[#d4af37] text-[#4d2811] hover:text-[#140703] border-[#d4af37]/40'
+                            : 'bg-[#241108] hover:bg-[#34180c] text-[#fce293] border-white/5'
+                        }`}
                       >
                         {preset}
                       </button>
@@ -827,20 +986,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Description */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Description
                   </label>
                   <textarea
                     rows={3}
                     value={editForm.description}
                     onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-xs text-white leading-relaxed focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs leading-relaxed focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Badge Tag (Optional) */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Badge Tag (Optional)
                   </label>
                   <input
@@ -848,12 +1015,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="e.g. Most Loved, Kids Special, Daily Fresh"
                     value={editForm.badge}
                     onChange={(e) => setEditForm({ ...editForm, badge: e.target.value })}
-                    className="w-full bg-[#120703] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37]/40 text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-white/10 text-white placeholder-stone-500 focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Buttons */}
-                <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                <div className={`flex items-center gap-2 pt-3 border-t ${
+                  isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+                }`}>
                   <button
                     type="submit"
                     className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f7d668] to-[#b88616] text-[#140703] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
@@ -864,7 +1037,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   <button
                     type="button"
                     onClick={() => setEditingCake(null)}
-                    className="px-4 py-2.5 rounded-xl bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 text-xs font-semibold cursor-pointer"
+                    className={`px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors border ${
+                      isLight
+                        ? 'bg-[#f0e3d2] hover:bg-[#e4d1bd] text-[#542d17] border-[#d4af37]/30'
+                        : 'bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 border-transparent'
+                    }`}
                   >
                     Cancel
                   </button>
@@ -877,18 +1054,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         {/* Modal: Add New Cake to Any Page */}
         {isAddingNew && (
           <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-150">
-            <div className="relative w-full max-w-lg bg-[#1e0e07] border-2 border-[#d4af37] rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto">
+            <div className={`relative w-full max-w-lg border-2 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh] overflow-y-auto transition-colors ${
+              isLight
+                ? 'bg-[#fffdfa] border-[#d4af37] text-[#241107]'
+                : 'bg-[#1e0e07] border-[#d4af37] text-[#fbf6ee]'
+            }`}>
               
-              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <div className={`flex items-center justify-between pb-3 border-b mb-4 ${
+                isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+              }`}>
                 <div className="flex items-center gap-2">
                   <Plus className="w-4 h-4 text-[#d4af37]" />
-                  <h4 className="font-serif-luxury font-bold text-base text-[#fbf6ee]">
+                  <h4 className={`font-serif-luxury font-bold text-base ${
+                    isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+                  }`}>
                     Add New Cake Frame
                   </h4>
                 </div>
                 <button
                   onClick={() => setIsAddingNew(false)}
-                  className="p-1 text-stone-400 hover:text-white cursor-pointer"
+                  className={`p-1 cursor-pointer transition-colors ${
+                    isLight ? 'text-[#8b6b55] hover:text-[#241107]' : 'text-stone-400 hover:text-white'
+                  }`}
+                  aria-label="Close add modal"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -897,16 +1085,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
               <form onSubmit={handleSaveNew} className="space-y-4">
                 {/* Target Page */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Select Page Name
                   </label>
                   <select
                     value={addForm.section}
                     onChange={(e) => setAddForm({ ...addForm, section: e.target.value as CakeSectionId })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   >
                     {PAGE_DEFINITIONS.map(p => (
-                      <option key={p.id} value={p.id}>
+                      <option key={p.id} value={p.id} className={isLight ? 'bg-white text-[#241107]' : 'bg-[#1e0e07] text-[#fbf6ee]'}>
                         {p.icon} {p.badgeLabel}
                       </option>
                     ))}
@@ -915,11 +1109,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Cake Image Upload / Selection */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1.5">
+                  <label className={`block text-xs font-semibold mb-1.5 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Cake Photo
                   </label>
                   <div className="flex items-start gap-3">
-                    <div className="w-24 h-24 rounded-xl bg-[#120703] border border-[#d4af37]/40 p-1 flex items-center justify-center overflow-hidden shrink-0 shadow">
+                    <div className={`w-24 h-24 rounded-xl border p-1 flex items-center justify-center overflow-hidden shrink-0 shadow ${
+                      isLight ? 'bg-[#fbf7f0] border-[#d4af37]/40' : 'bg-[#120703] border-[#d4af37]/40'
+                    }`}>
                       <img
                         src={addForm.image || LOGO_IMAGE_PATH}
                         alt="Preview"
@@ -931,7 +1129,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     </div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-2">
-                        <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-[#2a1409] hover:bg-[#3d1d0e] border border-[#d4af37]/40 text-xs font-semibold text-[#fce293] cursor-pointer">
+                        <label className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-semibold cursor-pointer transition-colors ${
+                          isLight
+                            ? 'bg-[#eedbc4] hover:bg-[#d4af37] border-[#d4af37]/60 text-[#4d2811]'
+                            : 'bg-[#2a1409] hover:bg-[#3d1d0e] border border-[#d4af37]/40 text-[#fce293]'
+                        }`}>
                           <Upload className="w-3.5 h-3.5 text-[#d4af37]" />
                           <span>Upload from Device</span>
                           <input
@@ -948,7 +1150,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                             setPhotoPickerTarget('add');
                             setIsPhotoPickerOpen(true);
                           }}
-                          className="px-3 py-2 rounded-lg bg-[#241108] hover:bg-[#34180c] border border-white/10 text-xs font-semibold text-stone-200 cursor-pointer flex items-center gap-1"
+                          className={`px-3 py-2 rounded-lg border text-xs font-semibold cursor-pointer flex items-center gap-1 transition-colors ${
+                            isLight
+                              ? 'bg-white hover:bg-[#eedbc4] border-[#d4af37]/50 text-[#542d17]'
+                              : 'bg-[#241108] hover:bg-[#34180c] border border-white/10 text-stone-200'
+                          }`}
                         >
                           <ImageIcon className="w-3.5 h-3.5 text-[#d4af37]" />
                           <span>Choose Gallery</span>
@@ -960,7 +1166,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                         placeholder="Or enter Image URL"
                         value={addForm.image}
                         onChange={(e) => setAddForm({ ...addForm, image: e.target.value })}
-                        className="w-full bg-[#120703] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-stone-300 focus:outline-none focus:border-[#d4af37]"
+                        className={`w-full rounded-lg px-2.5 py-1.5 text-xs focus:outline-none transition-colors border ${
+                          isLight
+                            ? 'bg-white border-[#d4af37]/40 text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                            : 'bg-[#120703] border border-white/10 text-stone-300 placeholder-stone-500 focus:border-[#d4af37]'
+                        }`}
                       />
                     </div>
                   </div>
@@ -968,7 +1178,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Title */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Cake Name / Title
                   </label>
                   <input
@@ -977,13 +1189,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="e.g. Royal Golden Crown Chocolate Cake"
                     value={addForm.title}
                     onChange={(e) => setAddForm({ ...addForm, title: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-sm focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Price */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Price Details
                   </label>
                   <input
@@ -992,18 +1210,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="e.g. ₹500, ₹300, 1 KG – ₹500 | 1/2 KG – ₹300"
                     value={addForm.price}
                     onChange={(e) => setAddForm({ ...addForm, price: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-sm font-bold text-[#fce293] focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-sm font-bold focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#8a4e0c] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-[#fce293] focus:border-[#d4af37]'
+                    }`}
                   />
 
                   {/* Quick price chips */}
                   <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                    <span className="text-[10px] text-stone-400">Quick presets:</span>
+                    <span className={`text-[10px] font-medium ${isLight ? 'text-[#6b4226]' : 'text-stone-400'}`}>Quick presets:</span>
                     {pricePresets.map(preset => (
                       <button
                         key={preset}
                         type="button"
                         onClick={() => setAddForm({ ...addForm, price: preset })}
-                        className="px-2 py-0.5 rounded-md bg-[#241108] hover:bg-[#34180c] text-[10px] text-[#fce293] border border-white/5 cursor-pointer"
+                        className={`px-2 py-0.5 rounded-md text-[10px] cursor-pointer transition-colors border ${
+                          isLight
+                            ? 'bg-[#eedbc4] hover:bg-[#d4af37] text-[#4d2811] hover:text-[#140703] border-[#d4af37]/40'
+                            : 'bg-[#241108] hover:bg-[#34180c] text-[#fce293] border-white/5'
+                        }`}
                       >
                         {preset}
                       </button>
@@ -1013,7 +1239,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
 
                 {/* Description */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Description
                   </label>
                   <textarea
@@ -1021,13 +1249,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="100% Homemade fresh cake baked with pure vegetarian ingredients and rich chocolate ganache."
                     value={addForm.description}
                     onChange={(e) => setAddForm({ ...addForm, description: e.target.value })}
-                    className="w-full bg-[#120703] border border-[#d4af37]/40 rounded-xl px-3 py-2 text-xs text-white leading-relaxed focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs leading-relaxed focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37] text-[#241107] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-[#d4af37]/40 text-white focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Badge Tag */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#fce293] mb-1">
+                  <label className={`block text-xs font-semibold mb-1 ${
+                    isLight ? 'text-[#8a4e0c]' : 'text-[#fce293]'
+                  }`}>
                     Badge Tag (Optional)
                   </label>
                   <input
@@ -1035,12 +1269,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     placeholder="e.g. New Special, Bestseller, Kids Favorite"
                     value={addForm.badge}
                     onChange={(e) => setAddForm({ ...addForm, badge: e.target.value })}
-                    className="w-full bg-[#120703] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#d4af37]"
+                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none transition-colors border ${
+                      isLight
+                        ? 'bg-white border-[#d4af37]/40 text-[#241107] placeholder-[#8b6b55] focus:border-[#b88616]'
+                        : 'bg-[#120703] border border-white/10 text-white placeholder-stone-500 focus:border-[#d4af37]'
+                    }`}
                   />
                 </div>
 
                 {/* Submit */}
-                <div className="flex items-center gap-2 pt-3 border-t border-white/10">
+                <div className={`flex items-center gap-2 pt-3 border-t ${
+                  isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+                }`}>
                   <button
                     type="submit"
                     className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] via-[#f7d668] to-[#b88616] text-[#140703] font-bold text-xs uppercase tracking-wider hover:brightness-110 shadow-md cursor-pointer flex items-center justify-center gap-1.5"
@@ -1051,7 +1291,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                   <button
                     type="button"
                     onClick={() => setIsAddingNew(false)}
-                    className="px-4 py-2.5 rounded-xl bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 text-xs font-semibold cursor-pointer"
+                    className={`px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors border ${
+                      isLight
+                        ? 'bg-[#f0e3d2] hover:bg-[#e4d1bd] text-[#542d17] border-[#d4af37]/30'
+                        : 'bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 border-transparent'
+                    }`}
                   >
                     Cancel
                   </button>
@@ -1064,23 +1308,36 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
         {/* Modal: Bakery Photo Gallery Picker (1-click Select) */}
         {isPhotoPickerOpen && (
           <div className="fixed inset-0 z-70 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-150">
-            <div className="relative w-full max-w-2xl bg-[#1e0e07] border-2 border-[#d4af37] rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[85vh]">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+            <div className={`relative w-full max-w-2xl border-2 rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[85vh] transition-colors ${
+              isLight
+                ? 'bg-[#fffdfa] border-[#d4af37] text-[#241107]'
+                : 'bg-[#1e0e07] border-[#d4af37] text-[#fbf6ee]'
+            }`}>
+              <div className={`flex items-center justify-between pb-3 border-b mb-4 ${
+                isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+              }`}>
                 <div className="flex items-center gap-2">
                   <ImageIcon className="w-4 h-4 text-[#d4af37]" />
-                  <h4 className="font-serif-luxury font-bold text-base text-[#fbf6ee]">
+                  <h4 className={`font-serif-luxury font-bold text-base ${
+                    isLight ? 'text-[#241107]' : 'text-[#fbf6ee]'
+                  }`}>
                     Select Photo from Bakery Gallery
                   </h4>
                 </div>
                 <button
                   onClick={() => setIsPhotoPickerOpen(false)}
-                  className="p-1 text-stone-400 hover:text-white cursor-pointer"
+                  className={`p-1 cursor-pointer transition-colors ${
+                    isLight ? 'text-[#8b6b55] hover:text-[#241107]' : 'text-stone-400 hover:text-white'
+                  }`}
+                  aria-label="Close photo picker"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <p className="text-xs text-[#cbb8a5] mb-3">
+              <p className={`text-xs mb-3 ${
+                isLight ? 'text-[#5a341e]' : 'text-[#cbb8a5]'
+              }`}>
                 Click any cake image below to select it immediately for this cake frame.
               </p>
 
@@ -1090,7 +1347,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                     key={idx}
                     type="button"
                     onClick={() => handleSelectFromLibrary(photoUrl)}
-                    className="group relative h-28 rounded-xl bg-[#120703] border border-[#d4af37]/30 hover:border-[#d4af37] p-1.5 flex items-center justify-center overflow-hidden cursor-pointer transition-all hover:scale-105 active:scale-95 shadow"
+                    className={`group relative h-28 rounded-xl border p-1.5 flex items-center justify-center overflow-hidden cursor-pointer transition-all hover:scale-105 active:scale-95 shadow ${
+                      isLight
+                        ? 'bg-[#fbf7f0] border-[#d4af37]/40 hover:border-[#8a4e0c]'
+                        : 'bg-[#120703] border-[#d4af37]/30 hover:border-[#d4af37]'
+                    }`}
                   >
                     <img
                       src={photoUrl}
@@ -1110,10 +1371,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ isOpen, onClose 
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-white/10 flex justify-end">
+              <div className={`pt-3 border-t flex justify-end ${
+                isLight ? 'border-[#d4af37]/30' : 'border-white/10'
+              }`}>
                 <button
                   onClick={() => setIsPhotoPickerOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 text-xs font-semibold cursor-pointer"
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors border ${
+                    isLight
+                      ? 'bg-[#f0e3d2] hover:bg-[#e4d1bd] text-[#542d17] border-[#d4af37]/30'
+                      : 'bg-[#2a1409] hover:bg-[#381a0c] text-stone-300 border-transparent'
+                  }`}
                 >
                   Close
                 </button>

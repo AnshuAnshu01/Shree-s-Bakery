@@ -466,3 +466,34 @@ header.header-transparent .text-\[\#fce293\] {
   }
 }
 
+/* =========================================================================
+   ADMIN PORTAL LIGHT THEME CONTRAST SAFEGUARDS
+   Ensures all admin dashboard cards, forms, headers, labels, inputs, and modals
+   are 100% visible, sharp, and easy to read in Vanilla Cream light mode.
+   ========================================================================= */
+.theme-light .admin-portal {
+  background-color: #fffdfa !important;
+  color: #241107 !important;
+  border-color: #d4af37 !important;
+}
+
+.theme-light .admin-portal input,
+.theme-light .admin-portal select,
+.theme-light .admin-portal textarea {
+  color-scheme: light !important;
+  color: #241107 !important;
+  background-color: #ffffff !important;
+  border-color: rgba(212, 175, 55, 0.5) !important;
+}
+
+.theme-light .admin-portal input::placeholder,
+.theme-light .admin-portal textarea::placeholder {
+  color: #8b6b55 !important;
+  opacity: 0.9 !important;
+}
+
+.theme-light .admin-portal label {
+  color: #8a4e0c !important;
+}
+
+
