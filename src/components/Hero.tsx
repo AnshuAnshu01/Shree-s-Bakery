@@ -90,8 +90,7 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center text-center my-auto px-2">
         {/* Brand Logo with Glow */}
         <div className="mb-2 sm:mb-4 transform hover:scale-105 transition-transform duration-300 drop-shadow-md">
-          <BakeryLogo size="md" className="sm:hidden" textColor="text-white" />
-          <BakeryLogo size="xl" className="hidden sm:inline-flex" textColor="text-white" />
+          <BakeryLogo size="xl" textColor="text-white" />
         </div>
 
         {/* Emotional Hook Badge */}
