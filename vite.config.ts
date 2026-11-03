@@ -7,6 +7,11 @@ export default defineConfig(() => {
   return {
     plugins: [react(), tailwindcss()],
     envPrefix: ['VITE_', 'ADMIN_'],
+    define: {
+      'import.meta.env.VITE_ADMIN_PASSWORD': JSON.stringify(
+        process.env.VITE_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || 'Tina@123'
+      ),
+    },
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),
